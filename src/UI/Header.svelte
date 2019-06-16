@@ -7,8 +7,8 @@
     height: 4rem;
     background: #cf0056;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.26);
   }
 

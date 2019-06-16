@@ -5,33 +5,38 @@
   import TextInput from "./UI/TextInput.svelte";
   import Button from "./UI/Button.svelte";
   import EditMeetup from "./Meetups/EditMeetup.svelte";
+  import MeetupDetail from "./Meetups/MeetupDetail.svelte";
 
   // let meetups = ;
 
   let editMode;
+  let editedId;
+  let page = "overview";
+  let pageData = {};
 
-  function addMeetup(event) {
-    const meetupData = {
-      title: event.detail.title,
-      subtitle: event.detail.subtitle,
-      description: event.detail.description,
-      imageUrl: event.detail.imageUrl,
-      contactEmail: event.detail.email,
-      address: event.detail.address
-    };
-
-    // meetups.push(newMeetup); // DOES NOT WORK!
-    meetups.addMeetup(meetupData);
+  function savedMeetup(event) {
     editMode = null;
+    editedId = null;
   }
 
   function cancelEdit() {
     editMode = null;
+    editedId = null;
   }
 
-  function toggleFavorite(event) {
-    const id = event.detail;
-    meetups.toggleFavorite(id);
+  function showDetails(event) {
+    page = "details";
+    pageData.id = event.detail;
+  }
+
+  function closeDetails() {
+    page = "overview";
+    pageData = {};
+  }
+
+  function startEdit(event) {
+    editMode = "edit";
+    editedId = event.detail;
   }
 </script>
 
@@ -39,20 +44,21 @@
   main {
     margin-top: 5rem;
   }
-
-  .meetup-controls {
-    margin: 1rem;
-  }
 </style>
 
 <Header />
 
 <main>
-  <div class="meetup-controls">
-    <Button on:click={() => (editMode = 'add')}>New Meetup</Button>
-  </div>
-  {#if editMode === 'add'}
-    <EditMeetup on:save={addMeetup} on:cancel={cancelEdit} />
+  {#if page === 'overview'}
+    {#if editMode === 'edit'}
+      <EditMeetup id={editedId} on:save={savedMeetup} on:cancel={cancelEdit} />
+    {/if}
+    <MeetupGrid
+      meetups={$meetups}
+      on:showdetails={showDetails}
+      on:edit={startEdit}
+      on:add={() => {editMode = 'edit'}} />
+  {:else}
+    <MeetupDetail id={pageData.id} on:close={closeDetails} />
   {/if}
-  <MeetupGrid meetups={$meetups} on:togglefavorite={toggleFavorite} />
 </main>
